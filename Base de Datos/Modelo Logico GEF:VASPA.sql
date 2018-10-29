@@ -69,32 +69,6 @@ LOCK TABLES `CARRERA` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `CARRERA_MESA_EXAMEN`
---
-
-DROP TABLE IF EXISTS `CARRERA_MESA_EXAMEN`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `CARRERA_MESA_EXAMEN` (
-  `codCarrera` int(10) unsigned NOT NULL,
-  `codMesa` int(10) unsigned NOT NULL,
-  KEY `fk_CARRERA_has_MESA_EXAMEN_MESA_EXAMEN_idx` (`codMesa`),
-  KEY `fk_CARRERA_has_MESA_EXAMEN_CARRERA_idx` (`codCarrera`),
-  CONSTRAINT `fk_CARRERA_has_MESA_EXAMEN_CARRERA` FOREIGN KEY (`codCarrera`) REFERENCES `CARRERA` (`codCarrera`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_CARRERA_has_MESA_EXAMEN_MESA_EXAMEN` FOREIGN KEY (`codMesa`) REFERENCES `MESA_EXAMEN` (`codMesa`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `CARRERA_MESA_EXAMEN`
---
-
-LOCK TABLES `CARRERA_MESA_EXAMEN` WRITE;
-/*!40000 ALTER TABLE `CARRERA_MESA_EXAMEN` DISABLE KEYS */;
-/*!40000 ALTER TABLE `CARRERA_MESA_EXAMEN` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `CORRELATIVAD`
 --
 
@@ -155,15 +129,13 @@ DROP TABLE IF EXISTS `FECHA`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `FECHA` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `dia` varchar(45) NOT NULL,
   `mes` varchar(45) NOT NULL,
   `año` varchar(45) NOT NULL,
+  `idLlamado` int(10) unsigned NOT NULL,
   `indice` int(2) unsigned NOT NULL,
-  `LLAMADO_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_FECHA_LLAMADO_idx` (`LLAMADO_id`),
-  CONSTRAINT `fk_FECHA_LLAMADO` FOREIGN KEY (`LLAMADO_id`) REFERENCES `LLAMADO` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_FECHA_LLAMADO_idx` (`idLlamado`),
+  CONSTRAINT `fk_FECHA_LLAMADO` FOREIGN KEY (`idLlamado`) REFERENCES `LLAMADO` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -190,7 +162,7 @@ CREATE TABLE `LICENCIA` (
   `idProfesor` varchar(15) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_LICENCIA_PROFESOR_idx` (`idProfesor`),
-  CONSTRAINT `fk_LICENCIA_PROFESOR` FOREIGN KEY (`idProfesor`) REFERENCES `PROFESOR` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `fk_LICENCIA_PROFESOR` FOREIGN KEY (`idProfesor`) REFERENCES `PROFESOR` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -211,7 +183,7 @@ DROP TABLE IF EXISTS `LLAMADO`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `LLAMADO` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -238,10 +210,10 @@ CREATE TABLE `LLAMADO_MESA_EXAMEN` (
   `hora` time(5) NOT NULL,
   `dia` int(2) unsigned NOT NULL,
   `fechaUnica` date DEFAULT NULL,
-  KEY `fk_LLAMADO_has_MESA_EXAMEN_MESA_EXAMEN_idx` (`codMesa`),
-  KEY `fk_LLAMADO_has_MESA_EXAMEN_LLAMADO_idx` (`idLlamado`),
-  CONSTRAINT `fk_LLAMADO_has_MESA_EXAMEN_LLAMADO` FOREIGN KEY (`idLlamado`) REFERENCES `LLAMADO` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_LLAMADO_has_MESA_EXAMEN_MESA_EXAMEN` FOREIGN KEY (`codMesa`) REFERENCES `MESA_EXAMEN` (`codMesa`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_LLAMADO_has_MESA_EXAMEN_MESA_EXAMEN1_idx` (`codMesa`),
+  KEY `fk_LLAMADO_has_MESA_EXAMEN_LLAMADO1_idx` (`idLlamado`),
+  CONSTRAINT `fk_LLAMADO_has_MESA_EXAMEN_LLAMADO1` FOREIGN KEY (`idLlamado`) REFERENCES `LLAMADO` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LLAMADO_has_MESA_EXAMEN_MESA_EXAMEN1` FOREIGN KEY (`codMesa`) REFERENCES `MESA_EXAMEN` (`codMesa`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -269,7 +241,7 @@ CREATE TABLE `MESA_EXAMEN` (
   PRIMARY KEY (`codMesa`),
   KEY `fk_MESA_EXAMEN_TRIBUNAL_idx` (`idTribunal`),
   KEY `fk_MESA_EXAMEN_ASIGNATURA_idx` (`codAsignatura`),
-  CONSTRAINT `fk_MESA_EXAMEN_ASIGNATURA` FOREIGN KEY (`codAsignatura`) REFERENCES `ASIGNATURA` (`codAsignatura`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_MESA_EXAMEN_ASIGNATURA` FOREIGN KEY (`codAsignatura`) REFERENCES `ASIGNATURA` (`codAsignatura`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_MESA_EXAMEN_TRIBUNAL` FOREIGN KEY (`idTribunal`) REFERENCES `TRIBUNAL` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -284,6 +256,32 @@ LOCK TABLES `MESA_EXAMEN` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `MESA_EXAMEN_CARRERA`
+--
+
+DROP TABLE IF EXISTS `MESA_EXAMEN_CARRERA`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `MESA_EXAMEN_CARRERA` (
+  `codMesa` int(10) unsigned NOT NULL,
+  `codCarrera` int(10) unsigned NOT NULL,
+  KEY `fk_MESA_EXAMEN_has_CARRERA_CARRERA1_idx` (`codCarrera`),
+  KEY `fk_MESA_EXAMEN_has_CARRERA_MESA_EXAMEN1_idx` (`codMesa`),
+  CONSTRAINT `fk_MESA_EXAMEN_has_CARRERA_CARRERA1` FOREIGN KEY (`codCarrera`) REFERENCES `CARRERA` (`codCarrera`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_MESA_EXAMEN_has_CARRERA_MESA_EXAMEN1` FOREIGN KEY (`codMesa`) REFERENCES `MESA_EXAMEN` (`codMesa`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `MESA_EXAMEN_CARRERA`
+--
+
+LOCK TABLES `MESA_EXAMEN_CARRERA` WRITE;
+/*!40000 ALTER TABLE `MESA_EXAMEN_CARRERA` DISABLE KEYS */;
+/*!40000 ALTER TABLE `MESA_EXAMEN_CARRERA` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `PLAN`
 --
 
@@ -293,10 +291,10 @@ DROP TABLE IF EXISTS `PLAN`;
 CREATE TABLE `PLAN` (
   `codPlan` varchar(10) NOT NULL,
   `anio` year(4) NOT NULL,
-  `codCarrera` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `codCarrera` int(10) unsigned NOT NULL,
   PRIMARY KEY (`codPlan`),
   KEY `fk_PLAN_CARRERA_idx` (`codCarrera`),
-  CONSTRAINT `fk_PLAN_CARRERA` FOREIGN KEY (`codCarrera`) REFERENCES `CARRERA` (`codCarrera`) ON UPDATE CASCADE
+  CONSTRAINT `fk_PLAN_CARRERA` FOREIGN KEY (`codCarrera`) REFERENCES `CARRERA` (`codCarrera`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -348,14 +346,14 @@ CREATE TABLE `PROFESOR` (
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
-  `cargo` varchar(45) NOT NULL,
-  `categoria` varchar(45) NOT NULL,
-  `idDepartemento` int(10) unsigned NOT NULL,
+  `cargo` enum('') NOT NULL,
+  `categoria` enum('') NOT NULL,
+  `idDepartamento` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `dni_UNIQUE` (`dni`),
   UNIQUE KEY `email_UNIQUE` (`email`),
-  KEY `fk_PROFESOR_DEPARTAMENTO_idx` (`idDepartemento`),
-  CONSTRAINT `fk_PROFESOR_DEPARTAMENTO` FOREIGN KEY (`idDepartemento`) REFERENCES `DEPARTAMENTO` (`id`) ON UPDATE CASCADE
+  KEY `fk_PROFESOR_DEPARTAMENTO_idx` (`idDepartamento`),
+  CONSTRAINT `fk_PROFESOR_DEPARTAMENTO` FOREIGN KEY (`idDepartamento`) REFERENCES `DEPARTAMENTO` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -454,8 +452,8 @@ DROP TABLE IF EXISTS `TIPO_LICENCIA`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `TIPO_LICENCIA` (
-  `nombre` varchar(100) NOT NULL,
-  `descripción` varchar(100) DEFAULT NULL,
+  `nombre` int(10) unsigned NOT NULL,
+  `direccion` varchar(45) NOT NULL,
   `idLicencia` int(10) unsigned NOT NULL,
   KEY `fk_TIPO_LICENCIA_LICENCIA_idx` (`idLicencia`),
   CONSTRAINT `fk_TIPO_LICENCIA_LICENCIA` FOREIGN KEY (`idLicencia`) REFERENCES `LICENCIA` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -479,7 +477,7 @@ DROP TABLE IF EXISTS `TRIBUNAL`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `TRIBUNAL` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL,
   `presidente` varchar(15) NOT NULL,
   `vocal` varchar(15) NOT NULL,
   `vocal1` varchar(15) DEFAULT NULL,
@@ -518,4 +516,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-10-24 18:02:57
+-- Dump completed on 2018-10-25 18:34:17
